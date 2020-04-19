@@ -49,7 +49,7 @@ class AckermannDriveKeyop:
             max_steering_angle = 0.7
 
         if len(args) > 2:
-            cmd_topic = '/' + args[2]
+            cmd_topic = args[2]
         else:
             cmd_topic = '/summit_robot_control/command'
 
@@ -66,14 +66,15 @@ class AckermannDriveKeyop:
         self.motors_pub = rospy.Publisher(
             cmd_topic, AckermannDriveStamped, queue_size=1)
         rospy.Timer(rospy.Duration(1.0/5.0), self.pub_callback, oneshot=False)
-        self.print_state()
+        rospy.loginfo('ackermann_drive_keyop_node initialized')
         self.key_loop()
 
     def pub_callback(self, event):
         ackermann_cmd_msg = AckermannDriveStamped()
         ackermann_cmd_msg.drive.speed = self.speed
-        ackermann_cmd_msg.drive.steering_angle = self.steering_angle
+        ackermann_cmd_msg.drive.steering_angle = self.steering_angle  
         self.motors_pub.publish(ackermann_cmd_msg)
+        self.print_state()
 
     def print_state(self):
         sys.stderr.write('\x1b[2J\x1b[H')
@@ -133,3 +134,4 @@ class AckermannDriveKeyop:
 if __name__ == '__main__':
     rospy.init_node('ackermann_drive_keyop_node')
     keyop = AckermannDriveKeyop(sys.argv[1:len(sys.argv)])
+    rospy.spin()
